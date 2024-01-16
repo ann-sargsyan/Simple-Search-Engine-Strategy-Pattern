@@ -16,6 +16,7 @@ public class AnySearchStrategy extends SearchStrategy {
     protected List<Person> findMatchingByDetailAndStrategyType(String detail, PersonRepository personRepository, PersonInvertedRepository personInvertedRepository) {
         List<Person> personList = new ArrayList<>();
         TreeMap<String, List<Integer>> invertedPeopleData = personInvertedRepository.getInvertedPeopleData();
+
         if (invertedPeopleData.containsKey(detail)) {
             for (Integer line : invertedPeopleData.get(detail)) {
                 personList.add(personRepository.getMapOfPeople().get(line));

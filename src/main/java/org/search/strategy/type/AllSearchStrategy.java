@@ -6,6 +6,7 @@ import org.search.repository.PersonRepository;
 import org.search.strategy.SearchStrategy;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
@@ -28,10 +29,10 @@ public class AllSearchStrategy extends SearchStrategy {
     @Override
     protected List<Person> getResultBasedOnStrategy(List<List<Person>> allResults) {
         return allResults.stream()
-                .skip(1) // Skip the first list to have a basis for comparison
-                .flatMap(personList -> personList.stream())
+                .flatMap(Collection::stream)
                 .distinct()
-                .filter(person -> allResults.stream().allMatch(list -> list.contains(person)))
+                .filter(person -> allResults.stream().allMatch(list -> list.contains(person) || list == allResults.get(0)))
                 .collect(Collectors.toList());
+
     }
 }

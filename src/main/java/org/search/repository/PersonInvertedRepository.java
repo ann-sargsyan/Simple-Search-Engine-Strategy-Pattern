@@ -27,6 +27,10 @@ public class PersonInvertedRepository {
         invertedPeopleData.get(detail).add(numberOfLine);
     }
 
+    public static void makeEmpty(){
+        invertedPeopleData.clear();
+    }
+
     public TreeMap<String, List<Integer>> getInvertedPeopleData() {
         return invertedPeopleData;
     }

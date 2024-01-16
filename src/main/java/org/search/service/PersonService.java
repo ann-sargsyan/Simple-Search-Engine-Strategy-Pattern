@@ -1,5 +1,7 @@
 package org.search.service;
 
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.search.person.Person;
 import org.search.repository.PersonInvertedRepository;
 import org.search.repository.PersonRepository;
@@ -8,28 +10,27 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
 
+@RequiredArgsConstructor
+@NoArgsConstructor(force = true)
 public class PersonService {
     private static final int SIGN_OF_ZERO = 0;
     private static final int SIGN_OF_ONE = 1;
     private static final int SIGN_OF_TWO = 2;
     private static final int SIGN_OF_THREE = 3;
     private static final String SIGN_OF_SPACE = " ";
-    private static final String MATCH_WHITESPACES = "\\s";
+    private static final String MATCH_WHITESPACE = "\\s";
+
+    private static final String MATCH_WHITESPACES = "\\s+";
     private static final String NO_MATCHING_PEOPLE_MESSAGE = "No matching people found.";
     private static final String MATCHING_PEOPLE_MESSAGE = " persons found: ";
+    private static final String MESSAGE_FOR_SELECT_STRATEGY = "Select a matching strategy: ALL, ANY, NONE";
     private static final String INPUT_MESSAGE = "Enter a name or email to search all suitable people";
 
-    private PersonRepository repository;
+    private final PersonRepository repository;
 
-    private PersonInvertedRepository personInvertedRepository;
+    private final PersonInvertedRepository personInvertedRepository;
 
-    private PersonSearch personSearch;
-
-    public PersonService() {
-        this.repository = new PersonRepository();
-        this.personSearch = new PersonSearch();
-        this.personInvertedRepository = new PersonInvertedRepository();
-    }
+    private final PersonSearch personSearch;
 
     public void printAllPeople() {
         repository.getMapOfPeople().forEach((s, person) -> printDetails(person));
@@ -44,16 +45,27 @@ public class PersonService {
         }
     }
 
-    public void findMatchedPeople(Scanner scanner) {
-        messageForSelectStrategy(scanner);
-        String strategy = scanner.nextLine().trim().toUpperCase();
-        validateInput(strategy);
+    public void processDetailsForFindingPeople(Scanner scanner){
+           String strategy = getStrategyTypeFromInput(scanner);
+           String[] details = getDetailsFromInput(scanner);
+           List<Person> result = findMatchedPeople(details, strategy);
+           System.out.println(showCountOfMatches(result));
+           result.forEach(this::printDetails);
+    }
+
+    public List<Person> findMatchedPeople(String[] details, String strategy) {
+        return personSearch.findPersonDetails(details, strategy, repository, personInvertedRepository);
+    }
+
+    private String[] getDetailsFromInput(Scanner scanner){
         messageForSelectDetails();
         String inputLine = scanner.nextLine();
-        String[] details = inputLine.split("\\s+");
-        List<Person> result = personSearch.findPersonDetails(details, strategy, repository, personInvertedRepository);
-        System.out.println(showCountOfMatches(result));
-        result.forEach(this::printDetails);
+        return inputLine.split(MATCH_WHITESPACES);
+    }
+
+    private String getStrategyTypeFromInput(Scanner scanner){
+        messageForSelectStrategy(scanner);
+        return scanner.nextLine().trim().toUpperCase();
     }
 
     private String showCountOfMatches(List<Person> result) {
@@ -63,15 +75,8 @@ public class PersonService {
         return result.size() + MATCHING_PEOPLE_MESSAGE;
     }
 
-    private void validateInput(String strategy) {
-        if(!(strategy.equals("ALL") || strategy.equals("ANY") || strategy.equals("NONE"))){
-            System.out.println("There is no strategy type that you chose.");
-            System.exit(0);
-        }
-    }
-
     private Person createPersonWithDetailsFromInput(String input, int numberOfLine) {
-        String[] personDetails = input.split(MATCH_WHITESPACES, SIGN_OF_THREE);
+        String[] personDetails = input.split(MATCH_WHITESPACE, SIGN_OF_THREE);
 
         String firstName = personDetails[SIGN_OF_ZERO];
         String lastName = personDetails[SIGN_OF_ONE];
@@ -98,7 +103,7 @@ public class PersonService {
     }
 
     private void messageForSelectStrategy(Scanner scanner){
-        System.out.println("Select a matching strategy: ALL, ANY, NONE");
+        System.out.println(MESSAGE_FOR_SELECT_STRATEGY);
         scanner.nextLine();
     }
 }

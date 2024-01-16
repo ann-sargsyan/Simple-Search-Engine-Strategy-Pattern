@@ -15,6 +15,10 @@ public class PersonRepository {
         mapOfPeople.put(numberOfLine, new Person(fistName, lastName, email));
     }
 
+    public static void makeEmpty(){
+        mapOfPeople.clear();
+    }
+
     public HashMap<Integer, Person> getMapOfPeople() {
         return mapOfPeople;
     }
