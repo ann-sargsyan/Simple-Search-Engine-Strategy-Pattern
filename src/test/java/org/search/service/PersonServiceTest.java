@@ -20,7 +20,14 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(MockitoExtension.class)
 class PersonServiceTest {
     private static final String FILE_PATH = "/Users/ansargsyan/IdeaProjects/Simple Search Engine Strategy Pattern/src/test/resources/testfile.txt";
+    private static final String ALL_PEOPLE_DETAILS = "Dwight Joseph  djo@gmail.com\nRene Webb  webb@gmail.com\nKatie Jacobs  \nErick Harrington  harrington@gmail.com\nMyrtle Medina  \nErick Burgess";
     private static final String MATCHING_PEOPLE_MESSAGE = " persons found: ";
+    private static final String DETAILS_OF_FIRST_PERSON = "Erick Harrington harrington@gmail.com";
+    private static final String DETAILS_OF_DWIGHT = "Dwight Joseph djo@gmail.com";
+    private static final String STRATEGY_TYPE_ALL = "ALL";
+    private static final String STRATEGY_TYPE_ANY = "ANY";
+    private static final String STRATEGY_TYPE_NONE = "NONE";
+    private static final String SIGN_OF_SPACE = " ";
     private final ByteArrayOutputStream outputStreamCaptor = new ByteArrayOutputStream();
     private List<String> listOfDetails;
 
@@ -51,10 +58,9 @@ class PersonServiceTest {
 
         // WHEN
         personService.printAllPeople();
-        String actualResult = "Dwight Joseph  djo@gmail.com\nRene Webb  webb@gmail.com\nKatie Jacobs  \nErick Harrington  harrington@gmail.com\nMyrtle Medina  \nErick Burgess";
 
         // THEN
-        assertEquals(actualResult, outputStreamCaptor.toString().trim());
+        assertEquals(ALL_PEOPLE_DETAILS, outputStreamCaptor.toString().trim());
     }
 
     @Test
@@ -66,44 +72,41 @@ class PersonServiceTest {
     @Test
     void findMatchedPeopleWithStrategyAll() {
         //> GIVEN
-        String strategy = "ALL";
         String[] selectedDetails = new String[]{"erick ", "harrington"};
 
         //> WHEN
-        List<Person> personList = personService.findMatchedPeople(selectedDetails, strategy);
+        List<Person> personList = personService.findMatchedPeople(selectedDetails, STRATEGY_TYPE_ALL);
         Person firstPerson = personList.get(0);
-        String actualResult = firstPerson.firstName() + " " + firstPerson.lastName() + " " + firstPerson.email();
+        String actualResult = firstPerson.firstName() + SIGN_OF_SPACE + firstPerson.lastName() + SIGN_OF_SPACE + firstPerson.email();
 
         //> THEN
-        assertEquals("Erick Harrington harrington@gmail.com", actualResult);
+        assertEquals(DETAILS_OF_FIRST_PERSON, actualResult);
     }
     @Test
     void findMatchedPeopleWithStrategyAny() {
         //> GIVEN
-        String strategy = "ANY";
         String[] selectedDetails = new String[]{"erick ", "harrington"};
 
         //> WHEN
-        List<Person> personList = personService.findMatchedPeople(selectedDetails, strategy);
+        List<Person> personList = personService.findMatchedPeople(selectedDetails, STRATEGY_TYPE_ANY);
         Person firstPerson = personList.get(0);
-        String actualResult = firstPerson.firstName() + " " + firstPerson.lastName() + " " + firstPerson.email();
+        String actualResult = firstPerson.firstName() + SIGN_OF_SPACE + firstPerson.lastName() + SIGN_OF_SPACE + firstPerson.email();
 
         //> THEN
-        assertEquals("Erick Harrington harrington@gmail.com", actualResult);
+        assertEquals(DETAILS_OF_FIRST_PERSON, actualResult);
     }
     @Test
     void findMatchedPeopleWithStrategyNone() {
         //> GIVEN
-        String strategy = "NONE";
         String[] selectedDetails = new String[]{"erick ", "harrington"};
 
         //> WHEN
-        List<Person> personList = personService.findMatchedPeople(selectedDetails, strategy);
+        List<Person> personList = personService.findMatchedPeople(selectedDetails, STRATEGY_TYPE_NONE);
         Person firstPerson = personList.get(0);
-        String actualResult = firstPerson.firstName() + " " + firstPerson.lastName() + " " + firstPerson.email();
+        String actualResult = firstPerson.firstName() + SIGN_OF_SPACE + firstPerson.lastName() + SIGN_OF_SPACE + firstPerson.email();
 
         //> THEN
-        assertEquals("Dwight Joseph djo@gmail.com", actualResult);
+        assertEquals(DETAILS_OF_DWIGHT, actualResult);
     }
 
     @Test
@@ -139,7 +142,7 @@ class PersonServiceTest {
         String actualResult = (String) privateMethod.invoke(personService, scanner);
 
         //> THEN
-        assertEquals("ALL", actualResult);
+        assertEquals(STRATEGY_TYPE_ALL, actualResult);
     }
 
     @Test

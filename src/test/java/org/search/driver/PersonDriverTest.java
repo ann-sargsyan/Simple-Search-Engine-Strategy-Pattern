@@ -18,6 +18,7 @@ class PersonDriverTest {
     private static final String FILE_PATH = "/Users/ansargsyan/IdeaProjects/Simple Search Engine Strategy Pattern/src/test/resources/testfile.txt";
     private static final String WRONG_FILE_PATH = "/Users/ansargsyan/Documents/target";
     private static final String EXCEPTION_MESSAGE = "There is no correct file";
+    private static final String DETAILS_OF_FIRST_PERSON = "Dwight Joseph djo@gmail.com";
 
     @Test
      void convertFromFile() {
@@ -32,8 +33,7 @@ class PersonDriverTest {
     void readLinesFromFile() throws IOException {
         var lines = PersonDriver.convertFromFile(FILE_PATH);
 
-       String expectedLines = "Dwight Joseph djo@gmail.com";
-       assertEquals(expectedLines, lines.get(0));
+       assertEquals(DETAILS_OF_FIRST_PERSON, lines.get(0));
     }
 
 }
