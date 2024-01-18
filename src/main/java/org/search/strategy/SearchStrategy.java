@@ -4,21 +4,21 @@ import org.search.person.Person;
 import org.search.repository.PersonRepository;
 import org.search.repository.PersonInvertedRepository;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public abstract class SearchStrategy {
 
     public List<Person> search(String[] details, PersonRepository personRepository, PersonInvertedRepository personInvertedRepository) {
-        List<List<Person>> allResults = new ArrayList<>();
-        for (String detail : details) {
-            allResults.add(findMatchingByDetailAndStrategyType(detail, personRepository, personInvertedRepository));
-        }
+        List<List<Person>> allResults = Arrays.stream(details)
+                .map(detail -> findMatchingByDetailAndStrategyType(detail, personRepository, personInvertedRepository))
+                .collect(Collectors.toList());
 
         return getResultBasedOnStrategy(allResults);
     }
 
-    protected  abstract List<Person> findMatchingByDetailAndStrategyType(String detail, PersonRepository personRepository, PersonInvertedRepository personInvertedRepository);
+    protected abstract List<Person> findMatchingByDetailAndStrategyType(String detail, PersonRepository personRepository, PersonInvertedRepository personInvertedRepository);
 
     protected abstract List<Person> getResultBasedOnStrategy(List<List<Person>> allResults);
 }

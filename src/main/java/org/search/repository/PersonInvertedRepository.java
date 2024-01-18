@@ -1,7 +1,6 @@
 package org.search.repository;
 
 import lombok.Getter;
-import org.search.repository.PersonRepository;
 
 import java.util.ArrayList;
 import java.util.List;

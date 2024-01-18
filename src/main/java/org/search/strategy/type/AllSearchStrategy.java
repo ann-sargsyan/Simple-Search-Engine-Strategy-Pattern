@@ -19,9 +19,9 @@ public class AllSearchStrategy extends SearchStrategy {
         TreeMap<String, List<Integer>> invertedPeopleData = personInvertedRepository.getInvertedPeopleData();
 
         if (invertedPeopleData.containsKey(detail)) {
-            for (Integer line : invertedPeopleData.get(detail)) {
-                personList.add(personRepository.getMapOfPeople().get(line));
-            }
+            invertedPeopleData.get(detail).stream()
+                    .map(line -> personRepository.getMapOfPeople().get(line))
+                    .forEach(personList::add);
         }
         return personList;
     }

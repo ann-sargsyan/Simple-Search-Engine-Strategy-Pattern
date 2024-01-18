@@ -23,13 +23,17 @@ public class SearchEngine {
 
     @SneakyThrows
     private SearchStrategy determineStrategyByInput(String strategyType)  {
-        if (ALL.equals(strategyType)) {
-           return new AllSearchStrategy();
-        } else if (ANY.equals(strategyType)){
-            return new AnySearchStrategy();
-        } else if(NONE.equals(strategyType)){
-            return new NoneSearchStrategy();
+        switch (strategyType) {
+            case ALL -> {
+                return new AllSearchStrategy();
+            }
+            case ANY -> {
+                return new AnySearchStrategy();
+            }
+            case NONE -> {
+                return new NoneSearchStrategy();
+            }
+            default -> throw new ClassNotFoundException(WRONG_STRATEGY_INPUT_MESSAGE);
         }
-        throw new ClassNotFoundException(WRONG_STRATEGY_INPUT_MESSAGE);
     }
 }

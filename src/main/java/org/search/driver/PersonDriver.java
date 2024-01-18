@@ -13,7 +13,7 @@ public final class PersonDriver {
         try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
             lines = reader.lines().collect(Collectors.toList());
         } catch (IOException exception) {
-            throw new IOException("There is no correct file");
+            throw new IOException("There is no problem with selected file " + fileName);
         }
         return lines;
     }

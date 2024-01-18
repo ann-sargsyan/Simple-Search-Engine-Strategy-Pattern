@@ -16,9 +16,9 @@ public class NoneSearchStrategy extends SearchStrategy {
         Collection<Person> personList = personRepository.getMapOfPeople().values();
 
         if (invertedPeopleData.containsKey(detail)) {
-            for (Integer line : invertedPeopleData.get(detail)) {
-                personList.remove(personRepository.getMapOfPeople().get(line));
-            }
+            invertedPeopleData.get(detail).stream()
+                    .map(line -> personRepository.getMapOfPeople().get(line))
+                    .forEach(personList::remove);
         }
         return personList.stream().toList();
     }
@@ -29,7 +29,7 @@ public class NoneSearchStrategy extends SearchStrategy {
                 .flatMap(Collection::stream)
                 .distinct()
                 .filter(person -> allResults.stream()
-                .allMatch(list -> list.contains(person) || list == allResults.get(0)))
+                        .allMatch(list -> list.contains(person) || list == allResults.get(0)))
                 .collect(Collectors.toList());
 
     }

@@ -9,15 +9,14 @@ import org.search.repository.PersonRepository;
 import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
+import java.util.StringJoiner;
 
 @RequiredArgsConstructor
-@NoArgsConstructor(force = true)
 public class PersonService {
-    private static final int SIGN_OF_ZERO = 0;
-    private static final int SIGN_OF_ONE = 1;
-    private static final int SIGN_OF_TWO = 2;
-    private static final int SIGN_OF_THREE = 3;
-    private static final String SIGN_OF_SPACE = " ";
+    private static final int ZERO = 0;
+    private static final int ONE = 1;
+    private static final int TWO = 2;
+    private static final int THREE = 3;
     private static final String MATCH_WHITESPACE = "\\s";
 
     private static final String MATCH_WHITESPACES = "\\s+";
@@ -33,7 +32,7 @@ public class PersonService {
     private final PersonSearch personSearch;
 
     public void printAllPeople() {
-        repository.getMapOfPeople().forEach((s, person) -> printDetails(person));
+        repository.getMapOfPeople().forEach((s, person) -> System.out.println(getDetails(person)));
     }
 
     public void processPeopleDetails(List<String> details) {
@@ -45,42 +44,39 @@ public class PersonService {
         }
     }
 
-    public void processDetailsForFindingPeople(Scanner scanner){
-           String strategy = getStrategyTypeFromInput(scanner);
-           String[] details = getDetailsFromInput(scanner);
-           List<Person> result = findMatchedPeople(details, strategy);
-           System.out.println(showCountOfMatches(result));
-           result.forEach(this::printDetails);
+    public void processDetailsForFindingPeople(Scanner scanner) {
+        String strategy = getStrategyTypeFromInput(scanner);
+        String[] details = getDetailsFromInput(scanner);
+        List<Person> result = findMatchedPeople(details, strategy);
+        System.out.println(showCountOfMatches(result));
+        result.forEach(person -> System.out.println(getDetails(person)));
     }
 
     public List<Person> findMatchedPeople(String[] details, String strategy) {
         return personSearch.findPersonDetails(details, strategy, repository, personInvertedRepository);
     }
 
-    private String[] getDetailsFromInput(Scanner scanner){
+    private String[] getDetailsFromInput(Scanner scanner) {
         messageForSelectDetails();
         String inputLine = scanner.nextLine();
         return inputLine.split(MATCH_WHITESPACES);
     }
 
-    private String getStrategyTypeFromInput(Scanner scanner){
+    private String getStrategyTypeFromInput(Scanner scanner) {
         messageForSelectStrategy(scanner);
         return scanner.nextLine().trim().toUpperCase();
     }
 
     private String showCountOfMatches(List<Person> result) {
-        if (result.isEmpty()) {
-            return NO_MATCHING_PEOPLE_MESSAGE;
-        }
-        return result.size() + MATCHING_PEOPLE_MESSAGE;
+        return result.isEmpty() ? NO_MATCHING_PEOPLE_MESSAGE : result.size() + MATCHING_PEOPLE_MESSAGE;
     }
 
     private Person createPersonWithDetailsFromInput(String input, int numberOfLine) {
-        String[] personDetails = input.split(MATCH_WHITESPACE, SIGN_OF_THREE);
+        String[] personDetails = input.split(MATCH_WHITESPACE, THREE);
 
-        String firstName = personDetails[SIGN_OF_ZERO];
-        String lastName = personDetails[SIGN_OF_ONE];
-        String email = personDetails.length > SIGN_OF_TWO ? personDetails[SIGN_OF_TWO] : null;
+        String firstName = personDetails[ZERO];
+        String lastName = personDetails[ONE];
+        String email = personDetails.length > TWO ? personDetails[TWO] : null;
 
         personInvertDetails(firstName, lastName, email, numberOfLine);
 
@@ -94,15 +90,17 @@ public class PersonService {
                 .ifPresent(e -> personInvertedRepository.invertPersonDetail(e, numberOfLine));
     }
 
-    private void printDetails(Person person) {
-        System.out.println(person.firstName() + SIGN_OF_SPACE + person.lastName() + SIGN_OF_SPACE + (person.email() != null ? SIGN_OF_SPACE + person.email() : SIGN_OF_SPACE));
+    private String getDetails(Person person) {
+        StringJoiner joinPersonDetails = new StringJoiner(" ");
+        return joinPersonDetails.add(person.firstName()).add(person.lastName())
+                .add(Optional.ofNullable(person.email()).map(email -> " " + email).orElse("")).toString();
     }
 
     private void messageForSelectDetails() {
         System.out.println(INPUT_MESSAGE);
     }
 
-    private void messageForSelectStrategy(Scanner scanner){
+    private void messageForSelectStrategy(Scanner scanner) {
         System.out.println(MESSAGE_FOR_SELECT_STRATEGY);
         scanner.nextLine();
     }

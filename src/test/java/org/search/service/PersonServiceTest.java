@@ -2,7 +2,11 @@ package org.search.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.search.driver.PersonDriver;
 import org.search.person.Person;
@@ -14,13 +18,15 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ExtendWith(MockitoExtension.class)
 class PersonServiceTest {
     private static final String FILE_PATH = "/Users/ansargsyan/IdeaProjects/Simple Search Engine Strategy Pattern/src/test/resources/testfile.txt";
-    private static final String ALL_PEOPLE_DETAILS = "Dwight Joseph  djo@gmail.com\nRene Webb  webb@gmail.com\nKatie Jacobs  \nErick Harrington  harrington@gmail.com\nMyrtle Medina  \nErick Burgess";
+    private static final String ALL_PEOPLE_DETAILS = "Dwight Joseph  djo@gmail.com\nRene Webb  webb@gmail.com\nKatie Jacobs \nErick Harrington  harrington@gmail.com\nMyrtle Medina \nErick Burgess";
     private static final String MATCHING_PEOPLE_MESSAGE = " persons found: ";
     private static final String DETAILS_OF_FIRST_PERSON = "Erick Harrington harrington@gmail.com";
     private static final String DETAILS_OF_DWIGHT = "Dwight Joseph djo@gmail.com";
@@ -40,7 +46,7 @@ class PersonServiceTest {
     PersonServiceTest() throws IOException {
         personRepository = new PersonRepository();
         personInvertedRepository = new PersonInvertedRepository();
-        personService = new PersonService(personRepository, personInvertedRepository, new PersonSearch());
+        personService = new PersonService(new PersonRepository(), new PersonInvertedRepository(), new PersonSearch());
         listOfDetails = PersonDriver.convertFromFile(FILE_PATH);
     }
 
@@ -53,13 +59,13 @@ class PersonServiceTest {
 
     @Test
     void printAllPeople() {
-        // GIVEN
+        //> GIVEN
         System.setOut(new PrintStream(outputStreamCaptor));
 
-        // WHEN
+        //> WHEN
         personService.printAllPeople();
 
-        // THEN
+        //> THEN
         assertEquals(ALL_PEOPLE_DETAILS, outputStreamCaptor.toString().trim());
     }
 
@@ -69,44 +75,25 @@ class PersonServiceTest {
         assertNotNull(personRepository.getMapOfPeople());
     }
 
-    @Test
-    void findMatchedPeopleWithStrategyAll() {
+    @ParameterizedTest
+    @MethodSource("invalidStrategyTypeParameters")
+    void findMatchedPeopleWithStrategy(String strategyType, String expectedReault){
         //> GIVEN
         String[] selectedDetails = new String[]{"erick ", "harrington"};
 
         //> WHEN
-        List<Person> personList = personService.findMatchedPeople(selectedDetails, STRATEGY_TYPE_ALL);
+        List<Person> personList = personService.findMatchedPeople(selectedDetails, strategyType);
         Person firstPerson = personList.get(0);
         String actualResult = firstPerson.firstName() + SIGN_OF_SPACE + firstPerson.lastName() + SIGN_OF_SPACE + firstPerson.email();
 
         //> THEN
-        assertEquals(DETAILS_OF_FIRST_PERSON, actualResult);
+        assertEquals(expectedReault, actualResult);
     }
-    @Test
-    void findMatchedPeopleWithStrategyAny() {
-        //> GIVEN
-        String[] selectedDetails = new String[]{"erick ", "harrington"};
-
-        //> WHEN
-        List<Person> personList = personService.findMatchedPeople(selectedDetails, STRATEGY_TYPE_ANY);
-        Person firstPerson = personList.get(0);
-        String actualResult = firstPerson.firstName() + SIGN_OF_SPACE + firstPerson.lastName() + SIGN_OF_SPACE + firstPerson.email();
-
-        //> THEN
-        assertEquals(DETAILS_OF_FIRST_PERSON, actualResult);
-    }
-    @Test
-    void findMatchedPeopleWithStrategyNone() {
-        //> GIVEN
-        String[] selectedDetails = new String[]{"erick ", "harrington"};
-
-        //> WHEN
-        List<Person> personList = personService.findMatchedPeople(selectedDetails, STRATEGY_TYPE_NONE);
-        Person firstPerson = personList.get(0);
-        String actualResult = firstPerson.firstName() + SIGN_OF_SPACE + firstPerson.lastName() + SIGN_OF_SPACE + firstPerson.email();
-
-        //> THEN
-        assertEquals(DETAILS_OF_DWIGHT, actualResult);
+    static Stream<Arguments> invalidStrategyTypeParameters() {
+        return Stream.of(
+                Arguments.of(STRATEGY_TYPE_ALL, DETAILS_OF_FIRST_PERSON),
+                Arguments.of(STRATEGY_TYPE_ANY, DETAILS_OF_FIRST_PERSON),
+                Arguments.of(STRATEGY_TYPE_NONE, DETAILS_OF_DWIGHT));
     }
 
     @Test
