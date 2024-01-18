@@ -1,6 +1,5 @@
 package org.search.service;
 
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.search.person.Person;
 import org.search.repository.PersonInvertedRepository;

@@ -33,7 +33,7 @@ public class SearchEngine {
             case NONE -> {
                 return new NoneSearchStrategy();
             }
-            default -> throw new ClassNotFoundException(WRONG_STRATEGY_INPUT_MESSAGE);
+            default -> throw new RuntimeException(WRONG_STRATEGY_INPUT_MESSAGE);
         }
     }
 }
